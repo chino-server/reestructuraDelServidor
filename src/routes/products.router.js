@@ -1,47 +1,27 @@
 import { Router } from "express";
-import {ProductManager}  from "../dao/productsManager.js";
+import {
+  getAllProducts,
+  findProductById,
+  addControllerProduct,
+  updateByIdControllers,
+  deleteByIdControllers,
+} from "../controllers/products.controllers.js";
 
+const router = Router();
+// Endpoint para actualizar traer todos los productos
+router.get("/products", getAllProducts);
 
-const router = Router()
+// Endpoint para buscar un producto por ID
+router.get("/product/:pid", findProductById);
 
-const productManager= new ProductManager()
+// Endpoint para buscar agregar un producto
+router.post("/product", addControllerProduct);
 
-router.get ('/', async (req, res)=>{
-    const products = await productManager.getProducts()
-    res.json ({products})
+// Endpoint para actualizar un producto
+router.put("/product/:pid", updateByIdControllers);
 
-})
+// Endpoint para eliminar un producto
 
-router.post("/", async (req, res) => {
-    try {
-      const product = req.body;
-      if (
-        !product.title ||
-        !product.description ||
-        !product.price ||
-        !product.stock ||
-        !product.category
-      ) {
-        res
-          .status(400)
-          .send({ status: "error", error: "Todos los campos son obligatorios" });
-        return;
-      }
-      const newProduct = await productManager.addProduct(product);
-      if (!newProduct) {
-        res
-          .status(400)
-          .send({ status: "error", error: "El código del producto ya existe" });
-      } else {
-        res.status(201).send({ status: "success", payload: newProduct });
-      }
-    } catch (err) {
-      console.error(err);
-      res
-        .status(500)
-        .send({ status: "error", error: "Error al agregar el producto" });
-    }
-});
+router.delete("/product/:pid", deleteByIdControllers);
 
-
-export default router
+export default router;

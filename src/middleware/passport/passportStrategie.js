@@ -2,8 +2,9 @@ import passport from "passport";
 import pkg from "mongoose";
 import { Strategy as LocalStrategy, Strategy } from "passport-local";
 import { Strategy as GithubStrategy } from "passport-github2";
-import { userModel } from "../db/models/users.model.js";
-import { compareData, hashData } from "../utils.js";
+import { userModel } from "../../DAL/models/users.model.js";
+import { compareData, hashData } from "../../utils.js";
+import { addUser as addUserService } from "../../services/users.service.js";
 
 const { ValidationError } = pkg;
 // LOCAL LOGIN
@@ -38,25 +39,12 @@ passport.use(
       usernameField: "email",
       passReqToCallback: true,
     },
-    async (req, email, password, done) => {
+    async (req,email,password, done) => {
       try {
-        const user = await userModel.findOne({ email });
-        if (user) {
-          return done(null, false, {
-            message: "El correo electrónico ya está en uso.",
-          });
-        }
-        const hashPassword = await hashData(password);
-        const newUser = { ...req.body, password: hashPassword };
-        const userDB = await userModel.create(newUser);
-        done(null, userDB);
+        const user = await addUserService(req.body);
+        done(null, user);
       } catch (error) {
-        if (error instanceof ValidationError) {
-          return done(null, false, {
-            message:
-              "Error de validación. Por favor, verifique los datos ingresados.",
-          });
-        }
+        console.log(error);
         done(error);
       }
     }
@@ -73,7 +61,7 @@ passport.use(
       callbackURL: "http://localhost:8000/users/github",
     },
     async (accessToken, refreshToken, profile, done) => {
-        console.log(profile);
+      console.log(profile);
       const email = profile._json.email;
       const userDB = await userModel.findOne({ email });
       if (userDB) {
@@ -82,7 +70,7 @@ passport.use(
       const newUser = {
         first_name: profile._json.login,
         last_name: profile._json.login,
-        email:profile._json.email,
+        email: profile._json.email,
         password: "123",
       };
       const newUserDB = await userModel.create(newUser);

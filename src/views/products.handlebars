@@ -118,7 +118,7 @@
         </style>
 
         <div class="row">
-          {{#each products}}
+          {{#each docs}}
             <div class="col-lg-3 col-4">
               <!-- Tarjeta de producto -->
               <div class="small-box bg-secundary d-flex flex-column">
@@ -139,6 +139,12 @@
               </div>
             </div>
           {{/each}}
+        </div>
+
+        <div class="pagination">
+          <p>Página {{page}} de {{totalPages}}</p>
+          <a href="?page={{prevPage}}">Página anterior</a>
+          <a href="?page={{nextPage}}">Siguiente página</a>
         </div>
 
         

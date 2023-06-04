@@ -7,12 +7,15 @@ import { __dirname } from "./utils.js";
 import viewsRouter from './routes/views.router.js'
 import userRouter from './routes/user.router.js'
 import productsRouter from './routes/products.router.js'
-import './db/dbConfig.js'
+import cartsRouter from './routes/carts.router.js'
+import './DAL/dbConfig.js'
 import MongoStore from "connect-mongo";
 import passport from "passport";
-import "./passport/passportStrategie.js"
+import "./middleware/passport/passportStrategie.js"
+import config from "./config.js";
 
 const app = express ()
+const port = config.port
 
 app.use (express.json())
 app.use (express.urlencoded({extended:true}))
@@ -53,7 +56,8 @@ app.use (passport.session())
 app.use ('/', viewsRouter)
 app.use ('/users', userRouter)
 app.use('/api', productsRouter)
+app.use('/api', cartsRouter)
 
-app.listen (8001, ()=>{
+app.listen (port, ()=>{
     console.log('Servidor escuchando');
 })
